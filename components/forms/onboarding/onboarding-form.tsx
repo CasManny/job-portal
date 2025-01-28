@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import UserTypeFormSelection from "./user-type-form";
 import CompanyForm from "./company-form";
+import JobSeekerForm from "./job-seeker-form";
 
 export type UserSelectionType = "company" | "jobSeeker" | null;
 
@@ -21,7 +22,7 @@ const OnboardingForm = () => {
       case 1:
         return <UserTypeFormSelection onSelect={handleUserTypeSelection} />
       case 2:
-        return userType === "company" ? <CompanyForm /> : "user";
+        return userType === "company" ? <CompanyForm /> : <JobSeekerForm />;
       default:
         return null;
     }
