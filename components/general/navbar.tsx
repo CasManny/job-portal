@@ -3,6 +3,7 @@ import React from "react";
 import { Button, buttonVariants } from "../ui/button";
 import { ModeToggle } from "./theme-toggle";
 import { auth, signOut } from "@/app/utils/auth";
+import UserDropdown from "./user-dropdown";
 
 const Navbar = async () => {
   const session = await auth();
@@ -13,25 +14,26 @@ const Navbar = async () => {
           Job <span className="text-primary">Next</span>
         </h1>
       </Link>
-      <div className="flex items-center gap-2">
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center gap-5">
+        <ModeToggle />
+        <Link href={"/post-job"} className={buttonVariants({ size: "lg" })}>
+          Post Job
+        </Link>
         {session?.user ? (
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <Button>Logout</Button>
-          </form>
+          <UserDropdown
+            email={session.user.email as string}
+            image={session.user.image as string}
+            name={session.user.name as string}
+          />
         ) : (
           <Link
-            href={"/"}
+            href="/login"
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
             Login
           </Link>
         )}
-        <ModeToggle />
       </div>
     </nav>
   );

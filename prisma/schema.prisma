@@ -82,6 +82,8 @@ model Company {
   xAccount String?
   userId String @unique
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  JobPost JobPost[]
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -98,6 +100,33 @@ model JobSeeker {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model JobPost {
+  id String @id @default(uuid())
+
+  jobTitle String
+  employmentType String
+  location String
+  salaryFrom Int
+  salaryTo Int
+  jobDescription String
+  listingDuration Int
+  benefits String[]
+  status JobPostStatus @default(DRAFT)
+
+  Company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+enum JobPostStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
 }
 
 
