@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { requireUser } from "./utils/require-user";
-import { companySchema, jobseekerSchema } from "./utils/zod-schemas";
+import { companySchema, createJobSchema, jobseekerSchema } from "./utils/zod-schemas";
 import { prisma } from "./utils/db";
 import { redirect } from "next/navigation";
 import { UTApi } from "uploadthing/server";
@@ -94,3 +94,52 @@ export const createJobSeeker = async (
 
   return redirect("/");
 };
+
+export const createJob = async (data: z.infer<typeof createJobSchema>) => {
+  const user = await requireUser()
+  const req = await request()
+
+  const decision = await aj.protect(req)
+  if (decision.isDenied()) {
+    throw new Error("Forbidden")
+  }
+
+  const validateData = createJobSchema.parse(data)
+
+  const company = await prisma.company.findUnique({
+    where: {
+      userId: user.id
+    },
+    select: {
+      id: true,
+      user: {
+        select: {
+          stripeCustomerId: true
+        }
+      }
+    }
+  })
+
+  if (!company?.id) {
+    return redirect("/")
+  }
+
+  let stripeCustomerId = 
+
+  const jobPost = await prisma.jobPost.create({
+    data: {
+      jobDescription: validateData.jobDescription,
+      jobTitle: validateData.jobTitle,
+      employmentType: validateData.employmentType,
+      location: validateData.location,
+      salaryFrom: validateData.salaryFrom,
+      salaryTo: validateData.salaryTo,
+      listingDuration: validateData.listingDuration,
+      benefits: validateData.benefits,
+      companyId: company.id
+    }
+  })
+
+  redirect('/')
+
+}

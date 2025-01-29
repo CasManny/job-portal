@@ -10,6 +10,10 @@ import ArcJetLogo from "@/public/vercel.svg";
 import InngestLogo from "@/public/window.svg";
 import Image from "next/image";
 import CreateJobForm from "@/components/forms/create-job-form";
+import { prisma } from "@/app/utils/db";
+import { redirect } from "next/navigation";
+import { auth } from "@/app/utils/auth";
+import { requireUser } from "@/app/utils/require-user";
 
 const companies = [
   { id: 0, name: "ArcJet", logo: ArcJetLogo },
@@ -48,10 +52,43 @@ const stats = [
   { value: "500+", label: "Companies hiring monthly" },
 ];
 
-const PostJobHomepage = () => {
+
+const getCompany = async (userId: string) => {
+  const data = await prisma.company.findUnique({
+    where: {
+      userId: userId
+    },
+    select: {
+      name: true,
+      location: true,
+      about: true,
+      logo: true,
+      xAccount: true,
+      website: true,
+    }
+  })
+  if (!data) {
+    return redirect('/')
+  }
+
+  return data
+}
+
+const PostJobHomepage = async () => {
+  const user = await requireUser()
+
+  const data = await getCompany(user.id as string)
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5">
-      <CreateJobForm />
+      <CreateJobForm
+        companyAbout={data.about}
+        companyLocation={data.location}
+        companyLogo={data.logo}
+        companyName={data.name}
+        companyWebsite={data.website}
+        companyXAccount={data.xAccount}
+      />
       <div className="col-span-1">
         <Card>
           <CardHeader>
