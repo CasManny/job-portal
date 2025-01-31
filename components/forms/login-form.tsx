@@ -8,10 +8,10 @@ import {
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { auth, signIn } from "@/app/utils/auth";
-import GeneralSubmitButton from "../general/submit-button";
 import { redirect } from "next/navigation";
 import Github from "../svgs/github";
 import Google from "../svgs/google";
+import { GeneralSubmitButton } from "../general/submit-button";
 
 const LoginForm = async () => {
     const session = await auth()

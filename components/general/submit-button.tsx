@@ -2,7 +2,7 @@
 import React, { ReactNode } from "react";
 import { Button } from "../ui/button";
 import { useFormStatus } from "react-dom";
-import { Loader2 } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface GeneralSubmitButtonProps {
@@ -20,7 +20,7 @@ interface GeneralSubmitButtonProps {
   icon?: ReactNode;
 }
 
-const GeneralSubmitButton = ({
+export const GeneralSubmitButton = ({
   text,
   variant,
   className,
@@ -44,4 +44,30 @@ const GeneralSubmitButton = ({
   );
 };
 
-export default GeneralSubmitButton;
+export function SaveJobButton({ savedJob }: { savedJob: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      variant="outline"
+      disabled={pending}
+      type="submit"
+      className="flex items-center gap-2"
+    >
+      {pending ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Saving...</span>
+        </>
+      ) : (
+        <>
+          <Heart
+            className={`size-4 transition-colors ${
+              savedJob ? "fill-current text-red-500" : ""
+            }`}
+          />
+          {savedJob ? "Saved" : "Save Job"}
+        </>
+      )}
+    </Button>
+  );
+}
