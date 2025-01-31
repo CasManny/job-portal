@@ -8,6 +8,8 @@ import { redirect } from "next/navigation";
 import { UTApi } from "uploadthing/server";
 import arcjet, { detectBot, shield } from "./utils/arcjet";
 import { request } from "@arcjet/next";
+import { stripe } from "./utils/stripe";
+import { jobListingDurationPricing } from "./utils/job-listing-duration-prices";
 
 const aj = arcjet
   .withRule(
@@ -124,7 +126,27 @@ export const createJob = async (data: z.infer<typeof createJobSchema>) => {
     return redirect("/")
   }
 
-  let stripeCustomerId = 
+  let stripeCustomerId = company.user.stripeCustomerId
+  
+  if (!stripeCustomerId) {
+    const customer = await stripe.customers.create({
+      email: user.email as string,
+      name: user.name as string,
+
+    })
+
+    stripeCustomerId = customer.id;
+
+    // update use with stripe customer id
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        stripeCustomerId: customer.id
+      }
+    })
+  }
 
   const jobPost = await prisma.jobPost.create({
     data: {
@@ -137,9 +159,43 @@ export const createJob = async (data: z.infer<typeof createJobSchema>) => {
       listingDuration: validateData.listingDuration,
       benefits: validateData.benefits,
       companyId: company.id
+    },
+    select: {
+      id: true
     }
   })
 
-  redirect('/')
+  const pricingTier = jobListingDurationPricing.find((tier) => tier.days === validateData.listingDuration)
+
+  if (!pricingTier) {
+    throw new Error("Invalid Listing duration selected")
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    customer: stripeCustomerId,
+    line_items: [
+      {
+        price_data: {
+          product_data: {
+            name: `Job posting - ${pricingTier.days} Days`,
+            description: pricingTier.description,
+            // images: ["paste the link to your logo here to appear in checkout"]
+          },
+          currency: "USD",
+          unit_amount: pricingTier.price * 100, // since stripe uses cents for payments
+        },
+        quantity: 1
+      }
+    ],
+    metadata: {
+      jobId: jobPost.id
+    },
+    mode: "payment",
+    success_url: `${process.env.NEXT_PUBLIC_URL!}/payment/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL!}/payment/cancel`
+
+  })
+
+ return redirect(session.url as string)
 
 }

@@ -17,7 +17,7 @@ model User {
   sessions      Session[]
   Company Company?
   JobSeeker JobSeeker?
-  stripeCustomerId String?
+  stripeCustomerId String? @unique
 
   userType UserType? 
 
