@@ -22,6 +22,7 @@ model User {
   userType UserType? 
 
   onBoardingCompleted Boolean @default(false)
+  SavedJobPost SavedJobPost[]
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,6 +120,8 @@ model JobPost {
   Company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String 
 
+  SavedJobPost SavedJobPost[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -130,5 +133,20 @@ enum JobPostStatus {
   EXPIRED
 }
 
+
+model SavedJobPost {
+  id String @id @default(uuid())
+  JobPost JobPost @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  jobPostId String 
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+@@unique([userId, jobPostId])
+}
 
  

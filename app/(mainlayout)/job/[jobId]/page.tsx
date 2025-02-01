@@ -128,7 +128,7 @@ const JobIdPage = async ({ params }: { params: Params }) => {
             <div>
               <h1 className="text-3xl font-bold">{jobData.jobTitle}</h1>
               <div className="flex items-center gap-2 mt-2">
-                <span className="font-medium">{jobData.company.name}</span>
+                <span className="font-medium">{jobData.Company.name}</span>
 
                 <Badge className="rounded-full" variant="secondary">
                   {jobData.employmentType}
@@ -206,7 +206,7 @@ const JobIdPage = async ({ params }: { params: Params }) => {
                   <h3 className="font-semibold">Apply now</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Please let {jobData.company.name} know you found this job on
+                  Please let {jobData.Company.name} know you found this job on
                   JobMarshal. This helps us grow!
                 </p>
               </div>
@@ -266,24 +266,24 @@ const JobIdPage = async ({ params }: { params: Params }) => {
             </div>
           </Card>
 
-          {/* Company Card */}
+          {/* ompany Card */}
           <Card className="p-6">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Image
                   src={
-                    jobData.company.logo ??
-                    `https://avatar.vercel.sh/${jobData.company.name}`
+                    jobData.Company.logo ??
+                    `https://avatar.vercel.sh/${jobData.Company.name}`
                   }
-                  alt={jobData.company.name}
+                  alt={jobData.Company.name}
                   width={48}
                   height={48}
                   className="rounded-full size-12"
                 />
                 <div>
-                  <h3 className="font-semibold">{jobData.company.name}</h3>
+                  <h3 className="font-semibold">{jobData.Company.name}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-3">
-                    {jobData.company.about}
+                    {jobData.Company.about}
                   </p>
                 </div>
               </div>
