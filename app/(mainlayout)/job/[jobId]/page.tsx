@@ -12,13 +12,13 @@ import { Heart } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@/app/utils/auth";
 
-import { saveJobPost, unsaveJobPost } from "@/app/actions";
 import arcjet, { detectBot } from "@/app/utils/arcjet";
 import { fixedWindow, request, tokenBucket } from "@arcjet/next";
 import { benefits } from "@/app/utils/list-of-benefits";
 import { getFlagEmoji } from "@/app/utils/countries-list";
 import { JsonToHtml } from "@/components/general/json-to-html";
 import { GeneralSubmitButton, SaveJobButton } from "@/components/general/submit-button";
+import { saveJobPost, unSaveJobPost } from "@/app/actions";
 
 const aj = arcjet.withRule(
   detectBot({
@@ -80,9 +80,9 @@ async function getJob(jobId: string, userId?: string) {
     userId
       ? prisma.savedJobPost.findUnique({
           where: {
-            userId_jobId: {
+            userId_jobPostId: {
               userId,
-              jobId,
+              jobPostId: jobId,
             },
           },
           select: {
@@ -147,7 +147,7 @@ const JobIdPage = async ({ params }: { params: Params }) => {
               <form
                 action={
                   savedJob
-                    ? unsaveJobPost.bind(null, savedJob.id)
+                    ? unSaveJobPost.bind(null, savedJob.id)
                     : saveJobPost.bind(null, jobId)
                 }
               >
